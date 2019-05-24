@@ -1,0 +1,13 @@
+{
+  "name": "disco-roll",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "SITE_URL=https://cex.io/version node index.js",
+    "debug": "SITE_URL=https://m.cex.io:4443/version node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
