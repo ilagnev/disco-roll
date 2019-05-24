@@ -7,16 +7,15 @@ async function runCommand(cmd) {
 	return (stdout || '').trim();
 }
 
-module.exports = (async () => {
-	await runCommand('gpio mode 7 output');
-	await runCommand('gpio mode 21 output');
-
-	return {
-		turnOnBall: () => runCommand('gpio write 7 1'),
-		turnOffBall: () => runCommand('gpio write 7 0'),
-		turnOnDebug: () => runCommand('gpio write 21 1'),
-		turnOffDebug: () => runCommand('gpio write 21 0'),
-		isBallOn: async () => await runCommand('gpio read 7') === '1',
-		isDebugOn: async () => await runCommand('gpio read 21') === '1',
-	}
-})();
+module.exports = {
+	initHardware: async () => {
+		await runCommand('gpio mode 7 output');
+		await runCommand('gpio mode 21 output');
+	},
+	turnOnBall: () => runCommand('gpio write 7 1'),
+	turnOffBall: () => runCommand('gpio write 7 0'),
+	turnOnDebug: () => runCommand('gpio write 21 1'),
+	turnOffDebug: () => runCommand('gpio write 21 0'),
+	isBallOn: async () => await runCommand('gpio read 7') === '1',
+	isDebugOn: async () => await runCommand('gpio read 21') === '1',
+}

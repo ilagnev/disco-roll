@@ -16,6 +16,7 @@ if (!siteUrl) {
 }
 
 const {
+	initHardware,
 	turnOnBall, turnOffBall,
 	turnOnDebug, turnOffDebug,
 	isBallOn, isDebugOn,
@@ -63,6 +64,8 @@ const isCexAlive = () => {
 }
 
 const init = async () => {
+	await initHardware();
+
 	isBall = await isBallOn();
 	isDebug = await isDebugOn();
 
