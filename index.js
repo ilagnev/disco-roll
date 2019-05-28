@@ -66,7 +66,10 @@ const isCexAlive = () => {
 		console.error(new Date(), err.message || err);
 
 		// no internet connection
-		if (['ECONNREFUSED', 'ENOTFOUND'].includes(err.code) && isDebug === false) {
+		// ECONNREFUSED - server down
+		// ENOTFOUND - unable to connect or resolve dns
+		// ETIMEDOUT - slow request
+		if (['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT'].includes(err.code) && isDebug === false) {
 			switchDebug();
 		}
 	});
