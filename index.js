@@ -4,15 +4,23 @@ const url = require('url');
 const interval = 5000;
 const siteUrl = process.env['SITE_URL'];
 let urlObj;
-let = isBall = false;
-let = isDebug = false;
 
 if (!siteUrl) {
 	console.error('SITE_URL not defined');
 	process.exit(-2);
 } else {
 	urlObj = url.parse(siteUrl);
-	console.log(`URL to watch: ${siteUrl}`, { urlObj });
+	console.log(`URL to watch: ${siteUrl}`, JSON.stringify(urlObj));
+}
+
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
+
+const requestParams = {
+	method: 'HEAD',
+	protocol: urlObj.protocol,
+	host: urlObj.hostname,
+  port: urlObj.port,
+  path: urlObj.path,
 }
 
 const {
@@ -22,41 +30,44 @@ const {
 	isBallOn, isDebugOn,
 } = require('./tumblers');
 
-const requestParams = {
-	method: 'HEAD',
-	protocol: urlObj.protocol,
-	host: urlObj.host,
-  port: urlObj.port,
-  path: urlObj.path,
+let = isBall = false;
+let = isDebug = false;
+
+const switchBall = () => {
+	isBall = !isBall;
+	console.log('switch ball to', isBall);
+	isBall ? turnOnBall() : turnOffBall();
+}
+
+const switchDebug = () => {
+	isDebug = !isDebug;
+	console.log('switch debug to', isDebug);
+	isDebug ? turnOnDebug() : turnOffDebug();
 }
 
 const isCexAlive = () => {
-	const request = http.request(requestParams, (res) => {
+	const request = http.request(requestParams, res => {
+		console.log(new Date(), res.statusCode);
 
-		console.log('not ended date:', new Date());
-		console.log('not ended statusCode:', res.statusCode);
-		// let data = '';
-		// res.on('data', chunk => data += chunk);
+		// disco ball
+		if (res.statusCode === 521 && isBall === false) {
+			switchBall();
+		} else if (res.statusCode === 200 && isBall === true) {
+			switchBall();
+		}
 
-		res.on('end', () => {
-			console.log(new Date());
-			console.log(res.statusCode);
-			console.log('');
-			// console.log(data.trim());
-			// console.log(res.headers);
-		});
+		// debug diod
+		if (isDebug === true) {
+			switchDebug();
+		}
 	});
 
 	request.on('error', err => {
-		console.error(err);
+		console.error(new Date(), err.message || err);
 
 		// no internet connection
-		if (err.code === 'ENOTFOUND') {
-			//todo turn red diod bulb (write to some channel)
-			if (isDebug === false) {
-				isDebug = true;
-				turnOnDebug();
-			}
+		if (['ECONNREFUSED', 'ENOTFOUND'].includes(err.code) && isDebug === false) {
+			switchDebug();
 		}
 	});
 
@@ -69,7 +80,7 @@ const init = async () => {
 	isBall = await isBallOn();
 	isDebug = await isDebugOn();
 
-	console.log('init: ', { isBall, isDebug });
+	console.log('init: ', { isBall, isDebug }, '\n');
 
 	isCexAlive();
 	setInterval(() => isCexAlive(), interval);

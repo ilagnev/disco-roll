@@ -2,6 +2,10 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
 async function runCommand(cmd) {
+	if (process.env['DEBUG']) {
+		return '0';
+	}
+
   const { stdout, stderr } = await exec(cmd);
   console.log(`${cmd}: stdout:${stdout} stderr:${stderr}`);
 	return (stdout || '').trim();
